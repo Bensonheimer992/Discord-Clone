@@ -21,7 +21,7 @@ import { useOrigin } from "@/hooks/use-origin";
 import { useState } from "react";
 
 export const InviteModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  const { onOpen, isOpen, onClose, type, data } = useModal();
 
   const origin = useOrigin();
 
@@ -43,7 +43,16 @@ export const InviteModal = () => {
   }
 
   const onNew = async () => {
-    
+    try {
+      setIsLoading(true);
+      const response = await axios.patch(`/api/servers/${server?.id}/invite-code`)
+
+      onOpen("invite", { server: response.data });
+    }catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -59,13 +68,13 @@ export const InviteModal = () => {
               Server Invite Link
             </Label>
             <div className="flex items-center mt-2 gap-x-2">
-              <Input className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0" value={inviteUrl}/>
-              <Button size="icon" onClick={onCopy}>
+              <Input disabled={isLoading} className="bg-zinc-300/50 border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0" value={inviteUrl}/>
+              <Button disabled={isLoading} size="icon" onClick={onCopy}>
                 {copied ? <Check className="w-4 h-4" /> :
                  <Copy className="w-4 h-4"/>}
               </Button>
             </div>
-            <Button variant="link" size="sm" className=" text-xs text-zinc-500 mt-4">
+            <Button disabled={isLoading} variant="link" size="sm" className=" text-xs text-zinc-500 mt-4" onClick={onNew}>
               Generate a new Link
               <RefreshCw className="w-4 h-4 ml-2"/>
             </Button>
