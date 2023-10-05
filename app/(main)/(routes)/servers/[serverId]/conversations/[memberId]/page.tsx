@@ -3,6 +3,7 @@ import { redirectToSignIn } from "@clerk/nextjs";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { getOrCreateConversation } from "@/lib/conversation";
+import ChatHeader from "@/components/chat/chat-header";
 
 interface MemberIdPageProps {
     params: {
@@ -46,8 +47,13 @@ const MemberIdPage = async ({
       const otherMember = memberOne.profileId === profile.id ? memberTwo : memberOne;
 
     return ( 
-        <div>
-            Member Id Page
+        <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
+            <ChatHeader 
+            imageUrl={otherMember.profile.imageUrl}
+            name={otherMember.profile.name}
+            serverId={params.serverId}
+            type="conversation"
+            />
         </div>
      );
 }
