@@ -6,6 +6,8 @@ import "@livekit/components-styles";
 import { Channel } from "@prisma/client";
 import { useUser } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
+import { useParams, useRouter, usePathname, useSearchParams } from "next/navigation";
+import qs from "query-string";
 
 interface MediaRoomProps {
   chatId: string;
@@ -20,6 +22,10 @@ export const MediaRoom = ({
 }: MediaRoomProps) => {
   const { user } = useUser();
   const [token, setToken] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const isVideo = searchParams?.get("video");
 
   useEffect(() => {
     if (!user?.firstName || !user?.lastName) return;
@@ -36,6 +42,17 @@ export const MediaRoom = ({
       }
     })()
   }, [user?.firstName, user?.lastName, chatId]);
+
+  const onClick = () => {
+    const url = qs.stringifyUrl({
+      url: pathname || "",
+      query: {
+        video: isVideo ? undefined : true,
+      }
+    }, { skipNull: true });
+
+    router.push(url);
+  }
 
   if (token === "") {
     return (
@@ -58,6 +75,7 @@ export const MediaRoom = ({
       connect={true}
       video={video}
       audio={audio}
+      onDisconnected={onClick}
     >
       <VideoConference />
     </LiveKitRoom>
